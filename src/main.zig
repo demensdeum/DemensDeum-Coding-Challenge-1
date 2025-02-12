@@ -14,12 +14,21 @@ pub fn main() !void {
 
 
 
-    const file_path = "image.png";
+    // Import image data
+    const image_data = @import("image_data.zig");
 
-    // Load image to get dimensions
-    const temp_surface = sdl.IMG_Load(file_path);
+    // Create IO from memory
+    const io = sdl.SDL_IOFromConstMem(&image_data.image_png, image_data.image_png.len);
+    if (io == null) {
+        std.debug.print("SDL_IOFromConstMem Error: {s}\n", .{sdl.SDL_GetError()});
+        return error.IOFromMemoryFailed;
+    }
+    defer _ = sdl.SDL_CloseIO(io);
+
+    // Load image from memory
+    const temp_surface = sdl.IMG_Load_IO(io, true);
     if (temp_surface == null) {
-        std.debug.print("IMG_Load Error: {s}\n", .{sdl.SDL_GetError()});
+        std.debug.print("IMG_Load_RW Error: {s}\n", .{sdl.SDL_GetError()});
         return error.ImageLoadFailed;
     }
     defer sdl.SDL_DestroySurface(temp_surface);
@@ -28,10 +37,10 @@ pub fn main() !void {
     const width = temp_surface.*.w;
     const height = temp_surface.*.h;
 
-    std.debug.print("Loaded Image: {s} ({d}x{d})\n", .{ file_path, width, height });
+    std.debug.print("Loaded Image: {d}x{d}\n", .{ width, height });
 
     // Create window
-    const window = sdl.SDL_CreateWindow("SDL3 PNG Renderer", width, height, 0);
+    const window = sdl.SDL_CreateWindow("SDL3 PNG Renderer", width, height, @as(u32, 0));
     if (window == null) {
         std.debug.print("SDL_CreateWindow Error: {s}\n", .{sdl.SDL_GetError()});
         return error.WindowCreationFailed;
