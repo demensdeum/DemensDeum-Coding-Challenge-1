@@ -1,7 +1,7 @@
 # DemensDeum-Coding-Challenge-1
 Reference code example for DemensDeum Coding Challenge #1
 
-Install zig, run command:
+Install zig, SDL3, SDL3_Image, run command:
 zig build run
 
 All your base are belong to us!!!
